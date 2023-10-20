@@ -1,31 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Apr 16 19:52:45 2022
-
-@author: jdc478
-"""
-
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-from matplotlib.animation import FuncAnimation
-import matplotlib
-import pandas as pd
-import seaborn as sns
-from datetime import datetime
-from datetime import time
-
-matplotlib.rcParams['mathtext.fontset'] = 'stix'
-matplotlib.rcParams['font.family'] = 'STIXGeneral'
-matplotlib.rcParams['font.size'] = '24'
-matplotlib.rcParams['font.weight'] = 'normal'
-matplotlib.rcParams['figure.figsize'] = 15, 12
-
-fig = plt.figure(figsize=(16, 12))
-ax = plt.axes()
-plt.style.use('ggplot')
-colors = plt.rcParams['axes.prop_cycle'].by_key()['color'] 
-
 e = 0.95
 sigma = 5.67e-8
 Ti = 100
@@ -328,6 +302,7 @@ def saturation(y,x,z, T):
         s[y,x,z] = np.exp(9.550426-(5723.265/T[y,x,z])+3.53068*np.log(T[y,x,z])-0.00728332*T[y,x,z])
 
     return s
+    
 def mass(y,x,z, s, T):
     
     flux = s[y,x,z]*(18e-3/(2*3.14*8.31*T[y,x,z]))**0.5
@@ -425,11 +400,6 @@ def efficiency(t, Pmw, p1):
         Ttracker = Tnew.copy()
         Ttrack.append(Ttracker)
         print(Eff)
-
- 
-
-
-
 
 def calculate(Pmw, time, T, p1, SEED):
 
