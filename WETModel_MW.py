@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
+"""
+Created on Sat Apr 16 19:52:45 2022
+
+@author: jdc478
+"""
+
 import numpy as np
+
 e = 0.95
 sigma = 5.67e-8
 Ti = 100
@@ -149,9 +156,14 @@ def dielectricconstant(y,x,z,T):
 
 def dielectricloss(y,x,z,T):
     Td = Tnew[y,x,z]
-    if Td <= 280:
-        ecalc = 0.077
-        eir[y,x,z] = ecalc
+    if Td <= 296:
+        a = 8.42684e-11
+        b = -9.34746e-8
+        c = 3.39475e-5
+        d = -4.46073e-3
+        e = 0.202337
+        ecalc = a*(Td**4)+b*(Td**3)+c*(Td**2)+d*(Td)+e
+        eir.append(ecalc)
     else: 
         a = -8.05191e-13
         b = 5.75914e-9
@@ -162,8 +174,8 @@ def dielectricloss(y,x,z,T):
         eir[y,x,z] = ecalc
     return err
         
-def E_abs(Pmw,y,x, z,t):
-    E1[z] = Pmw*np.cos(((2*pi*z*dz/lamdae))-(2*pi*2.45e9*t*dt))
+def E_abs(ef,y,x, z,t):
+    E1[z] = ef*np.cos(((2*pi*z*dz/lamdae))-(2*pi*2.45e9*t*dt))
 
 def powerabs(y,x,z):
     if y > 4 and y < 21:
@@ -302,7 +314,6 @@ def saturation(y,x,z, T):
         s[y,x,z] = np.exp(9.550426-(5723.265/T[y,x,z])+3.53068*np.log(T[y,x,z])-0.00728332*T[y,x,z])
 
     return s
-    
 def mass(y,x,z, s, T):
     
     flux = s[y,x,z]*(18e-3/(2*3.14*8.31*T[y,x,z]))**0.5
@@ -383,7 +394,7 @@ timetrack = {}
 
 
 
-def efficiency(t, Pmw, p1):
+def efficiency(t, ef, p1):
     InitialWater  = sum(sum(sum(wi)))*920*dx*dy*dz*1000
     print(InitialWater)
     MassLost = sum(sum(sum(mltrack)))
@@ -401,7 +412,12 @@ def efficiency(t, Pmw, p1):
         Ttrack.append(Ttracker)
         print(Eff)
 
-def calculate(Pmw, time, T, p1, SEED):
+ 
+
+
+
+
+def calculate(ef, time, T, p1, SEED):
 
     t_array = np.arange(0,time+dt, dt)
     for y in range(0, len(y_array)):
@@ -421,7 +437,7 @@ def calculate(Pmw, time, T, p1, SEED):
                         BoundCondition(y,x,z,T)
                         dielectricconstant(y,x,z, T)
                         dielectricloss(y,x,z,T)
-                        E_abs(Pmw,y,x,z,t)
+                        E_abs(ef,y,x,z,t)
                         powerabs(y,x,z)
                         density_dynamic(y,x,z)
                         thermcond(y,x,z, T)
@@ -432,9 +448,9 @@ def calculate(Pmw, time, T, p1, SEED):
                         alphacalc(y,x,z, t)
                     
         if t%100 == 0:
-            print('SEED: ' +str(SEED)+', Electric Field: ' +str(Pmw)+'V/m, Water Conc.: ' +str(round(wcountinitial*100,1))+'%, Total Time: ' +str(time)+'s, Running.... '+str(t)+'s')
+            print('SEED: ' +str(SEED)+', Electric Field: ' +str(ef)+'V/m, Water Conc.: ' +str(round(wcountinitial*100,1))+'%, Total Time: ' +str(time)+'s, Running.... '+str(t)+'s')
     
-            efficiency(t, Pmw, p1)
+            efficiency(t, ef, p1)
        
         
       
@@ -450,11 +466,11 @@ def calculate(Pmw, time, T, p1, SEED):
         T = Tnew.copy()
 
 
-Pmw = 8680 #Electric Field in V/m, calculated from repsective input power
+ef = 8680 #Electric Field in V/m, calculated from repsective input power
 TIME = 100 #time of running in seconds
 SEED = 1 #water distribution seed
 p1=0.5 #water content factor
   
 reset(p1, SEED) #resets the system
-calculate(Pmw, TIME, T,p1, SEED) #simulates the particular heating run
+calculate(ef, TIME, T,p1, SEED) #simulates the particular heating run
 
